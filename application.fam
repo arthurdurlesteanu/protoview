@@ -3,6 +3,7 @@ App(
     name="ProtoView",
     apptype=FlipperAppType.EXTERNAL,
     entry_point="protoview_app_entry",
+    sources=["*.c*", "!tests"],  # tests/ holds host-only unit tests
     cdefines=["APP_PROTOVIEW"],
     requires=["gui"],
     stack_size=8*1024,
