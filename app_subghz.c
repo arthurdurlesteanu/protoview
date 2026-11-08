@@ -8,6 +8,7 @@
 #include <furi_hal_rtc.h>
 #include <furi_hal_spi.h>
 #include <furi_hal_interrupt.h>
+#include <lib/subghz/devices/cc1101_configs.h>
 
 void raw_sampling_timer_start(ProtoViewApp *app);
 void raw_sampling_timer_stop(ProtoViewApp *app);
@@ -34,6 +35,23 @@ ProtoViewModulation ProtoViewModulations[] = {
     {NULL, NULL, 0, NULL, 0} /* End of list sentinel. */
 };
 
+/* Return the CC1101 registers of one of the standard Flipper presets.
+ * The firmware no longer exports furi_hal_subghz_load_preset(), but it
+ * exports the register tables, that we can load as custom presets. */
+static const uint8_t *radio_standard_preset_regs(FuriHalSubGhzPreset preset) {
+    switch(preset) {
+    case FuriHalSubGhzPresetOok270Async:
+        return subghz_device_cc1101_preset_ook_270khz_async_regs;
+    case FuriHalSubGhzPreset2FSKDev238Async:
+        return subghz_device_cc1101_preset_2fsk_dev2_38khz_async_regs;
+    case FuriHalSubGhzPreset2FSKDev476Async:
+        return subghz_device_cc1101_preset_2fsk_dev47_6khz_async_regs;
+    case FuriHalSubGhzPresetOok650Async:
+    default:
+        return subghz_device_cc1101_preset_ook_650khz_async_regs;
+    }
+}
+
 /* Called after the application initialization in order to setup the
  * subghz system and put it into idle state. */
 void radio_begin(ProtoViewApp* app) {
@@ -49,8 +67,8 @@ void radio_begin(ProtoViewApp* app) {
      * the modulation "custom" field is NULL, or a custom preset we
      * defined in custom_presets.h. */
     if (ProtoViewModulations[app->modulation].custom == NULL) {
-        furi_hal_subghz_load_preset(
-            ProtoViewModulations[app->modulation].preset);
+        furi_hal_subghz_load_custom_preset(radio_standard_preset_regs(
+            ProtoViewModulations[app->modulation].preset));
     } else {
         furi_hal_subghz_load_custom_preset(
             ProtoViewModulations[app->modulation].custom);
