@@ -11,9 +11,9 @@ CFLAGS := -std=gnu11 -g -O1 -Wall -Wextra -Werror -Wno-unused-parameter \
           -Istubs -I$(ROOT) -I. -DAPP_ROOT=\"$(ROOT)\"
 LDFLAGS := $(SAN) -lm
 
-APP_SRCS := $(ROOT)/signal.c $(ROOT)/fields.c $(ROOT)/crc.c $(ROOT)/raw_samples.c \
+APP_SRCS := $(ROOT)/signal.c $(ROOT)/fields.c $(ROOT)/crc.c $(ROOT)/raw_samples.c $(ROOT)/wake.c \
             $(wildcard $(ROOT)/protocols/*.c) $(wildcard $(ROOT)/protocols/tpms/*.c)
-TEST_SRCS := test_main.c test_vw.c test_pipeline.c
+TEST_SRCS := test_main.c test_vw.c test_pipeline.c test_wake.c
 
 BIN := build/host_tests
 

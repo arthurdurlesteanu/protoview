@@ -67,6 +67,7 @@ bool run_decoder(ProtoViewDecoder* dec, const char* chips, ProtoViewMsgInfo* inf
 int main(void) {
     test_vw_suite();
     test_pipeline_suite();
+    test_wake_suite();
     printf("%d checks, %d failed\n", tests_run, tests_failed);
     return tests_failed ? 1 : 0;
 }

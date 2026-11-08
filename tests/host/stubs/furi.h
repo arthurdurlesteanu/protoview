@@ -21,3 +21,13 @@ static inline void furi_mutex_free(FuriMutex*m){(void)m;}
 static inline int furi_mutex_acquire(FuriMutex*m,uint32_t w){(void)m;(void)w;return 0;}
 static inline int furi_mutex_release(FuriMutex*m){(void)m;return 0;}
 static inline uint32_t furi_get_tick(void){return 0;}
+/* FuriTimer: declared here, defined (with call recording) in test_wake.c. */
+typedef enum {FuriStatusOk = 0, FuriStatusError = -1} FuriStatus;
+typedef struct FuriTimer FuriTimer;
+typedef void (*FuriTimerCallback)(void* context);
+typedef enum {FuriTimerTypeOnce = 0, FuriTimerTypePeriodic = 1} FuriTimerType;
+FuriTimer* furi_timer_alloc(FuriTimerCallback cb, FuriTimerType type, void* ctx);
+void furi_timer_free(FuriTimer* t);
+FuriStatus furi_timer_start(FuriTimer* t, uint32_t ticks);
+FuriStatus furi_timer_stop(FuriTimer* t);
+static inline uint32_t furi_ms_to_ticks(uint32_t ms){return ms;}

@@ -30,3 +30,4 @@ void info_reset(ProtoViewMsgInfo* info);
 
 void test_vw_suite(void);
 void test_pipeline_suite(void);
+void test_wake_suite(void);

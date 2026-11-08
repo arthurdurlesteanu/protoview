@@ -57,6 +57,9 @@ static void input_callback(InputEvent* input_event, void* ctx)
  * special views ViewGoNext and ViewGoPrev in order to move to
  * the logical next/prev view. */
 static void app_switch_view(ProtoViewApp *app, ProtoViewCurrentView switchto) {
+    /* Any view change ends a TPMS wake burst: the carrier must never
+     * outlive the view that started it. */
+    wake_stop(app);
     furi_mutex_acquire(app->view_updating_mutex,FuriWaitForever);
 
     /* Switch to the specified view. */
@@ -158,6 +161,7 @@ ProtoViewApp* protoview_app_alloc() {
     app->modulation = 0; /* Defaults to ProtoViewModulations[0]. */
 
     furi_hal_power_suppress_charge_enter();
+    wake_init(app);
     app->running = 1;
 
     return app;
@@ -168,6 +172,9 @@ ProtoViewApp* protoview_app_alloc() {
  * even if we forget to free something here. */
 void protoview_app_free(ProtoViewApp *app) {
     furi_assert(app);
+
+    // LF carrier off and wake timer freed before anything else.
+    wake_deinit(app);
 
     // Put CC1101 on sleep, this also restores charging.
     radio_sleep(app);
@@ -254,7 +261,10 @@ int32_t protoview_app_entry(void* p) {
      * view_port_update() in order to refresh our screen content. */
     InputEvent input;
     while(app->running) {
-        FuriStatus qstat = furi_message_queue_get(app->event_queue, &input, 100);
+        FuriStatus qstat = furi_message_queue_get(app->event_queue, &input,
+                                                  WAKE_POLL_SLACK_MS);
+        /* Stop an expired wake burst here, on the main thread. */
+        wake_poll(app);
         if (qstat == FuriStatusOk) {
             if (DEBUG_MSG) FURI_LOG_E(TAG, "Main Loop - Input: type %d key %u",
                     input.type, input.key);
@@ -368,7 +378,8 @@ int32_t protoview_app_entry(void* p) {
         }
     }
 
-    /* App no longer running. Shut down and free. */
+    /* App no longer running. Shut down and free. Carrier off first. */
+    wake_stop(app);
     if (app->txrx->txrx_state == TxRxStateRx) {
         FURI_LOG_E(TAG, "Putting CC1101 to sleep before exiting.");
         radio_rx_end(app);
