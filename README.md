@@ -11,7 +11,7 @@ a sequence of bits encoded in [Manchester](https://en.wikipedia.org/wiki/Manches
 
 Other than showing the raw signal, ProtoView is able to decode a few interesting protocols:
 
-* TPMS sensors: Renault, Toyota, Schrader, Citroen, Ford.
+* TPMS sensors: Renault, Toyota, Schrader, Citroen, Ford, VW/Audi (Huf).
 * Microchip HSC200/300/301 Keeloq protocol.
 * Oregon thermometer protocol 2.
 * PT2262, SC5262 based remotes.
@@ -82,6 +82,7 @@ In the main screen, the application shows the longest coherent signal detected s
 * The UP and DOWN buttons change the scale. Default is 100us per pixel, but it will be adapted to the signal just captured.
 * A long press of the LEFT and RIGHT keys will pan the signal, to see what was transmitted before/after the current shown range.
 * A short press to OK will recenter the signal and set the scale back to the default for the specific pulse duration detected.
+* A long press of UP sends a 3 seconds 125 kHz wake burst, to wake up parked TPMS sensors (see below).
 
 Under the detected sequence, you will see a small triangle marking a
 specific sample. This mark means that the sequence looked coherent up
@@ -101,6 +102,24 @@ is something like `1000000/this-number*2`, but it depends on the encoding
 and could actually be `1000000/this-number*N` with `N > 2` (here 1000000
 is the number of microseconds in one second, and N is the number of clock
 cycles needed to represent a bit).
+
+## Waking up TPMS sensors
+
+Parked TPMS sensors often stay silent for a long time, until they are woken
+up by a 125 kHz LF field (this is what TPMS service tools do). In the main
+screen, a long press of UP turns on a plain, unmodulated 125 kHz carrier
+from the Flipper's built-in RFID coil for 3 seconds. A short vibration
+confirms the start, and "Waking 125kHz..." is shown while the carrier is on.
+The radio keeps listening during and after the burst.
+
+1. Select the right frequency and modulation first (for VW/Audi Huf sensors, 433.92 and "FSK 40kBaud"). If a decoded signal is already shown, long press OK to reset it, otherwise it will not be replaced by the sensor reply.
+2. Hold the back of the Flipper flat against the tyre sidewall, right at the valve stem (the sensor sits behind the valve).
+3. Long press UP and keep the Flipper still for the 3 seconds, then look for the decoded signal.
+
+The range is only a few centimeters, so placement matters: if nothing is
+received, move a little around the valve and try again. Each press gives a
+single 3 seconds burst, pressing again while it is on does nothing. Switching
+view or exiting the app turns the carrier off immediately.
 
 ## Info screen
 
@@ -122,6 +141,7 @@ rate.
 * Weather stations are often too in the 433.92Mhz OOK.
 * For car keys, try 433.92 OOK650 and 868.35 Mhz in OOK or 2FSK.
 * For TPMS try 433.92 in TPMS1 or TPMS2 modulations (FSK and OOK custom modulations optimized for these signals, that have a relatively high data rate).
+* VW/Audi (Huf) TPMS sensors (for instance 5Q0907275F) use 25us chips (40 kBaud): select 433.92 and the "FSK 40kBaud" modulation. The other modulations filter out pulses shorter than 30us, so they will not see these sensors.
 
 ## Signal creator
 

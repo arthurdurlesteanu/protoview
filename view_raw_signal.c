@@ -81,6 +81,11 @@ void process_input_raw_pulses(ProtoViewApp *app, InputEvent input) {
         if (input.key == InputKeyOk) {
             /* Reset the current sample to capture the next. */
             reset_current_signal(app);
+        } else if (input.key == InputKeyUp) {
+            /* TPMS wake: 125 kHz carrier for up to 3 seconds. Long UP
+             * is free here, while long LEFT/RIGHT pan the signal. */
+            if (wake_start(app))
+                ui_show_alert(app,"Waking 125kHz...",WAKE_MAX_MS);
         }
     } else if (input.type == InputTypeShort) {
         if (input.key == InputKeyOk) {

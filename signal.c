@@ -20,6 +20,7 @@ extern ProtoViewDecoder SchraderTPMSDecoder;
 extern ProtoViewDecoder SchraderEG53MA4TPMSDecoder;
 extern ProtoViewDecoder CitroenTPMSDecoder;
 extern ProtoViewDecoder FordTPMSDecoder;
+extern ProtoViewDecoder VWTPMSDecoder;
 extern ProtoViewDecoder KeeloqDecoder;
 extern ProtoViewDecoder ProtoViewChatDecoder;
 extern ProtoViewDecoder UnknownDecoder;
@@ -33,6 +34,7 @@ ProtoViewDecoder *Decoders[] = {
     &SchraderEG53MA4TPMSDecoder,    /* Schrader EG53MA4 TPMS. */
     &CitroenTPMSDecoder,            /* Citroen TPMS. */
     &FordTPMSDecoder,               /* Ford TPMS. */
+    &VWTPMSDecoder,                 /* VW / Audi (Huf) TPMS. */
     &KeeloqDecoder,                 /* Keeloq remote. */
     &ProtoViewChatDecoder,          /* Protoview simple text messages. */
 
